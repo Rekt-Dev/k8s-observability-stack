@@ -1,0 +1,27 @@
+# Grafana datasource provisioning
+# Placed in grafana.ini sidecar or mounted via ConfigMap.
+# kube-prometheus-stack auto-provisions the Prometheus datasource,
+# but this adds Loki and AlertManager as additional sources.
+#
+# In Helm values, reference via:
+#   grafana:
+#     additionalDataSources:
+#       - (content of each datasource below)
+---
+apiVersion: 1
+datasources:
+  - name: Prometheus
+    type: prometheus
+    access: proxy
+    url: http://monitoring-kube-prometheus-prometheus.monitoring.svc.cluster.local:9090
+    isDefault: true
+    jsonData:
+      timeInterval: "60s"
+      httpMethod: POST
+
+  - name: Alertmanager
+    type: alertmanager
+    access: proxy
+    url: http://monitoring-kube-prometheus-alertmanager.monitoring.svc.cluster.local:9093
+    jsonData:
+      implementation: prometheus
